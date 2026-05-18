@@ -2,9 +2,13 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as dotenv from 'dotenv';
 
+const originalPort = process.env.PORT;
 try {
   dotenv.config({ path: path.join(__dirname, '..', '.env') });
 } catch (e) {}
+if (originalPort) {
+  process.env.PORT = originalPort;
+}
 
 // Debug: write what environment variables are actually available
 try {
