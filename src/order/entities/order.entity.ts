@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { Restaurant } from '../../restaurant/entities/restaurant.entity';
 import { Table } from '../../table/entities/table.entity';
-import { OrderItem } from './order-item.entity';
+import type { OrderItem } from './order-item.entity';
 
 @Entity('orders')
 export class Order {
@@ -18,7 +18,7 @@ export class Order {
   @Column('float', { default: 0 }) taxAmount: number;
   @Column('float') finalAmount: number;
   @Column({ nullable: true }) paymentMethod: string;
-  @OneToMany(() => OrderItem, item => item.order, { cascade: true }) items: OrderItem[];
+  @OneToMany('OrderItem', 'order', { cascade: true }) items: OrderItem[];
   @CreateDateColumn() createdAt: Date;
   @UpdateDateColumn() updatedAt: Date;
 }
