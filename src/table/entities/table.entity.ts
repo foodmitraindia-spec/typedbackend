@@ -7,7 +7,7 @@ export class Table {
   @Column() number: string;
   @Column('int', { default: 4 }) capacity: number;
   @Column({ default: 'EMPTY' }) status: string;
-  @Column({ nullable: true }) currentOrderId: string | null;
+  @Column({ type: 'varchar', nullable: true }) currentOrderId: string | null;
   @Column() restaurantId: string;
   @ManyToOne(() => Restaurant, r => r.tables, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'restaurantId' }) restaurant: Restaurant;
