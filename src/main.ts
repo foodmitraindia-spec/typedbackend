@@ -4,7 +4,10 @@ import * as dotenv from 'dotenv';
 
 const originalPort = process.env.PORT;
 try {
-  dotenv.config({ path: path.join(__dirname, '..', '.env') });
+  const envPath = fs.existsSync(path.join(__dirname, '..', '.env')) 
+    ? path.join(__dirname, '..', '.env') 
+    : path.join(__dirname, '..', '.env.production');
+  dotenv.config({ path: envPath });
 } catch (e) {}
 if (originalPort) {
   process.env.PORT = originalPort;
