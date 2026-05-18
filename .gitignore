@@ -1,5 +1,5 @@
 # compiled output
-/dist
+# /dist removed so we can commit it to Hostinger
 /node_modules
 
 # Logs
