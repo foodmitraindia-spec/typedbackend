@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FoodMitra POS - API Engine</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    :root {
+      --bg-dark: #090a0f;
+      --bg-card: rgba(17, 19, 31, 0.65);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --primary: #ff4757;
+      --primary-glow: rgba(255, 71, 87, 0.35);
+      --accent: #2ed573;
+      --accent-glow: rgba(46, 213, 115, 0.3);
+      --blue: #1e90ff;
+      --text-main: #f1f2f6;
+      --text-muted: #a4b0be;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Ambient background glowing circles */
+    body::before {
+      content: '';
+      position: absolute;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+      top: -150px;
+      right: -100px;
+      z-index: -1;
+      filter: blur(80px);
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(30, 144, 255, 0.15) 0%, transparent 70%);
+      bottom: -100px;
+      left: -150px;
+      z-index: -1;
+      filter: blur(100px);
+      pointer-events: none;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    /* Header styling with premium glowing glassmorphism */
+    header {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 24px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      margin-bottom: 40px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-icon {
+      background: linear-gradient(135deg, var(--primary) 0%, #ff6b81 100%);
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px var(--primary-glow);
+    }
+
+    .logo-icon i {
+      font-size: 22px;
+      color: white;
+    }
+
+    .logo-text h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #ffffff, #dcdde1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo-text span {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(46, 213, 115, 0.1);
+      border: 1px solid rgba(46, 213, 115, 0.2);
+      border-radius: 100px;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .pulse {
+      width: 10px;
+      height: 10px;
+      background-color: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 var(--accent-glow);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 var(--accent-glow);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 8px rgba(46, 213, 115, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(46, 213, 115, 0);
+      }
+    }
+
+    /* Main Grid Layout */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      header {
+        flex-direction: column;
+        gap: 20px;
+        align-items: flex-start;
+        padding: 24px;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 35px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255, 71, 87, 0.25);
+      box-shadow: 0 12px 40px rgba(255, 71, 87, 0.08);
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 15px;
+    }
+
+    .card-title i {
+      color: var(--primary);
+    }
+
+    /* Details styling */
+    .db-details {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .detail-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+    }
+
+    .detail-item:last-child {
+      border-bottom: none;
+    }
+
+    .detail-label {
+      color: var(--text-muted);
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .detail-value {
+      font-weight: 500;
+      font-size: 15px;
+    }
+
+    .badge-secondary {
+      background: rgba(30, 144, 255, 0.1);
+      border: 1px solid rgba(30, 144, 255, 0.2);
+      color: var(--blue);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: monospace;
+    }
+
+    /* API Endpoint List */
+    .endpoints-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .endpoint-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .endpoint-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    .endpoint-route {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .method-badge {
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      font-family: 'Outfit', sans-serif;
+      text-transform: uppercase;
+      min-width: 75px;
+      text-align: center;
+    }
+
+    .method-get {
+      background: rgba(46, 213, 115, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(46, 213, 115, 0.15);
+    }
+
+    .method-post {
+      background: rgba(30, 144, 255, 0.1);
+      color: var(--blue);
+      border: 1px solid rgba(30, 144, 255, 0.15);
+    }
+
+    .route-path {
+      font-family: monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .route-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-left: 20px;
+    }
+
+    .btn-icon {
+      color: var(--text-muted);
+      transition: color 0.2s ease;
+    }
+
+    .endpoint-item:hover .btn-icon {
+      color: var(--primary);
+    }
+
+    /* Footer styling */
+    footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 30px 0;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    footer i {
+      color: var(--primary);
+      margin: 0 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Glowing Header -->
+    <header>
+      <div class="logo-container">
+        <div class="logo-icon">
+          <i class="fa-solid fa-utensils"></i>
+        </div>
+        <div class="logo-text">
+          <h1>FoodMitra POS</h1>
+          <span>API Engine Enterprise</span>
+        </div>
+      </div>
+      <div class="status-badge">
+        <div class="pulse"></div>
+        System Operational
+      </div>
+    </header>
+
+    <!-- Content Grid -->
+    <div class="grid">
+      <!-- Database & Server Configuration -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-server"></i> Server Configuration
+        </div>
+        <div class="db-details">
+          <div class="detail-item">
+            <span class="detail-label"><i class="fa-solid fa-database"></i> Database Host</span>
+            <span class="detail-value badge-secondary">srv1751.hstgr.io</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fa-solid fa-folder-tree"></i> Environment</span>
+            <span class="detail-value" style="color: var(--accent); font-weight: 600; text-transform: uppercase;">Production</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fa-solid fa-network-wired"></i> API Protocol</span>
+            <span class="detail-value">RESTful JSON</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fa-solid fa-shield-halved"></i> Global Route Prefix</span>
+            <span class="detail-value badge-secondary">/api</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label"><i class="fa-solid fa-laptop-code"></i> Framework</span>
+            <span class="detail-value">NestJS + TypeORM + SWC</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Core API Endpoints Quick Links -->
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-bolt"></i> Core API Explorer
+        </div>
+        <div class="endpoints-list">
+          <!-- Auth -->
+          <div class="endpoint-item" onclick="window.open('/api/auth/login', '_blank')">
+            <div class="endpoint-route">
+              <span class="method-badge method-post">POST</span>
+              <span class="route-path">/api/auth/login</span>
+              <span class="route-desc">Auth & Credentials</span>
+            </div>
+            <i class="fa-solid fa-arrow-up-right-from-square btn-icon"></i>
+          </div>
+
+          <!-- Menu Items -->
+          <div class="endpoint-item" onclick="window.open('/api/menu-item', '_blank')">
+            <div class="endpoint-route">
+              <span class="method-badge method-get">GET</span>
+              <span class="route-path">/api/menu-item</span>
+              <span class="route-desc">Fetch Menu Items</span>
+            </div>
+            <i class="fa-solid fa-arrow-up-right-from-square btn-icon"></i>
+          </div>
+
+          <!-- Tables -->
+          <div class="endpoint-item" onclick="window.open('/api/table', '_blank')">
+            <div class="endpoint-route">
+              <span class="method-badge method-get">GET</span>
+              <span class="route-path">/api/table</span>
+              <span class="route-desc">Fetch Tables List</span>
+            </div>
+            <i class="fa-solid fa-arrow-up-right-from-square btn-icon"></i>
+          </div>
+
+          <!-- Orders -->
+          <div class="endpoint-item" onclick="window.open('/api/order', '_blank')">
+            <div class="endpoint-route">
+              <span class="method-badge method-get">GET</span>
+              <span class="route-path">/api/order</span>
+              <span class="route-desc">Fetch Active Orders</span>
+            </div>
+            <i class="fa-solid fa-arrow-up-right-from-square btn-icon"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Glowing Footer -->
+    <footer>
+      Made with <i class="fa-solid fa-heart"></i> for FoodMitra POS. All Rights Reserved. &copy; 2026.
+    </footer>
+  </div>
+
+</body>
+</html>
